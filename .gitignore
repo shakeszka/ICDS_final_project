@@ -1,6 +1,9 @@
 *.idx
 *.pyc
 .whl
+*pk
+*pickle
+*txt
 tempCodeRunnerFile.py
 kot.gif
 music.mp3
