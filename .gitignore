@@ -1,4 +1,7 @@
 *.idx
+*.pyc
+.whl
 tempCodeRunnerFile.py
 kot.gif
 music.mp3
+DS_Store-3
