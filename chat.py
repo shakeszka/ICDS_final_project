@@ -106,9 +106,9 @@ class App(CTk):
                 client.login(usrName)
                 self.startChatting()
             else:
-                messagebox.showinfo('Wrong Password!')
+                messagebox.showinfo('Incorrect','Wrong Password!')
         else:
-            signedUpAlready = messagebox.askyesno("Oops, seems like you don't haven an account yet! Please sign up below first.")
+            signedUpAlready = messagebox.askyesno("Small error :(", "Oops, Seems like you don't haven an account yet! Please sign up below first.")
             if signedUpAlready:
                 self.usrSignUp()
 
@@ -123,18 +123,18 @@ class App(CTk):
             with open('usrs_info.pickle', 'rb') as usrFile:
                 userlist = pickle.load(usrFile)
             if password != passwordConfirm:
-                messagebox.showerror('Passwords do not match! Please try again!')
+                messagebox.showerror('Not matching', 'Passwords do not match! Please try again!')
             elif name in userlist:
-                messagebox.showerror('You have signed up! Please login with your username.')
+                messagebox.showerror('Success!', 'You have signed up! Please login with your username.')
             elif name == "":
-                messagebox.showerror("Forget to enter your name?")
+                messagebox.showerror('Forgot?',"Forget to enter your name?")
             elif password == "":
-                messagebox.showerror("Forget to enter your password?")
+                messagebox.showerror('Forgot?',"Forget to enter your password?")
             else:
                 userlist[name] = password
                 with open('usrs_info.pickle', 'wb') as usrFile:
                     pickle.dump(userlist, usrFile)
-                messagebox.showinfo('You have successfully signed up!')
+                messagebox.showinfo("Ura!", 'You have successfully signed up!')
                 self.signup_window.destroy()
         
         # pop up the sign up window on the top
@@ -220,7 +220,7 @@ class Chatbox(CTk):
         self.sidebar_frame = create_frame(self, self, 0, 0, rowspan=3, pady=0, corner_radius=0)
         self.sidebar_frame.grid_rowconfigure(4, weight=1)
         self.logo_label = create_label(self, self.sidebar_frame, 0, 0, text="Monogram", font=('Calibri',22))
-        #self.sidebar_button_1 = create_button(self, self.sidebar_frame, 1, 0, text='Pfp', command=self.second_column_music_on)
+        self.sidebar_button_1 = create_label(self, self.sidebar_frame, 1, 0, text=f'Hello, {usrName}!')
         #self.sidebar_button_2 = create_button(self, self.sidebar_frame, 2, 0, text='Profile', command=self.second_column_music_on)
         self.appearance_mode_label = create_label(self, self.sidebar_frame, 5, 0, text='Appearance Mode', font=('Calibri',14))
         self.appearance_mode_optionemenu = create_option_menu(self, self.sidebar_frame, 6, 0, values=["Light", "Dark", "System"], command=self.change_appearance_mode_event)
@@ -238,6 +238,7 @@ class Chatbox(CTk):
         self.whoListBox = Listbox(self.middle, listvariable=self.whoOnline, width=10, height=5)
         self.whoListBox.grid(row=3, column=0, rowspan=1, columnspan=1, padx=10, pady=10, sticky="nsew")
         self.whoListBox.bind('<Double-Button-1>', self.connectTo)
+
         # middle buttons
         self.middle_middle = create_frame(self, self, 1, 1)
         self.middle_middle.grid_rowconfigure(2, weight=1)
@@ -246,9 +247,9 @@ class Chatbox(CTk):
         # bottom buttons
         self.middle_bottom = create_frame(self, self, 2, 1, pady=(20, 20))
         self.middle_bottom.grid_rowconfigure(2, weight=1)
-        self.middle_label_1 = create_label(self, self.middle_bottom, 0, 0, text='TicTacToe Game', font=('Calibri',14), anchor='n')
-        self.middle_button_5 = create_button(self, self.middle_bottom, 1, 0, text='Player X', command=self.player_X)
-        self.middle_button_6 = create_button(self, self.middle_bottom, 2, 0, text='Player O', command=self.player_O)
+        self.middle_label_1 = create_label(self, self.middle_bottom, 0, 0, text='Snake Game', font=('Calibri',14), anchor='n')
+        self.middle_button_5 = create_button(self, self.middle_bottom, 1, 0, text='Play Snake', command=self.start_game)
+        self.middle_button_6 = create_button(self, self.middle_bottom, 2, 0, text='Scoreboard', command=self.scoreboard)
 
         ### --- textbox ---
         # message container
@@ -343,13 +344,76 @@ class Chatbox(CTk):
     def second_column_music_off(self):
         mixer.music.pause()
 
-    def player_O(self):
-        print("player_O clicked")
-        # runpy.run_path(path_name='playero.py')
+    def scoreboard(self):
+        # pop up the sign up window on the top
+        self.scoreboard_window = Toplevel(self)
+        self.scoreboard_window.title('Scoreboard')
+        self.scoreboard_window.geometry(f"{400}x{600}")
+        self.scoreboard_window.resizable(False, False)
+
+        # Column labels
+        CTkLabel(self.scoreboard_window, text='#', width=120, height=25).grid(row=0, column=0)
+        CTkLabel(self.scoreboard_window, text='Username', width=120, height=25).grid(row=0, column=1)
+        CTkLabel(self.scoreboard_window, text='Highest Score', width=120, height=25).grid(row=0, column=2)
+
+        # Load the data from the .pickle file
+        with open('scoreboard.pickle', 'rb') as file:
+            global scores
+            scores = pickle.load(file)
+
+        # Function to determine sort key
+        def sort_key(item):
+            username, score = item
+            try:
+                # Attempt to convert score to integer
+                return (True, int(score))  # True means it's a valid integer, sort by negative value for descending order
+            except ValueError:
+                # Return False to put non-integers last, keep original order among non-integers
+                return (False, 0)
+
+        # Sort the scores dictionary by attempting to convert scores to integers, with alphabetic last
+        sorted_scores = sorted(scores.items(), key=sort_key, reverse=True)
+
+        # Display scores in the grid, adding a rank number
+        for i, (username, score) in enumerate(sorted_scores, start=1):
+            CTkLabel(self.scoreboard_window, text=str(i), width=120, height=25).grid(row=i, column=0)
+            CTkLabel(self.scoreboard_window, text=username, width=120, height=25).grid(row=i, column=1)
+            CTkLabel(self.scoreboard_window, text=str(score), width=120, height=25).grid(row=i, column=2)
     
-    def player_X(self):
-        print("player_X clicked")
-        # runpy.run_path(path_name='playerx.py')
+    def load_score(self):
+        # loading existing scores or initialize an empty dictionary
+        print("Loading the score into .pickle")
+        try:
+            with open('scoreboard.pickle', 'rb') as pf:
+                user_scores = pickle.load(pf)
+        except (FileNotFoundError, EOFError):
+            user_scores = {}  # creating if no file exists or file is empty
+
+        # updating the score if the user exists and the new score is higher, or add new user
+        if usrName in user_scores:
+            if int(score) > int(user_scores[usrName]):
+                user_scores[usrName] = score
+                print(f"Updated score for {usrName} to {score}")
+        else:
+            user_scores[usrName] = score
+            print(f"Added new user {usrName} with score {score}")
+
+        # saving the updated dictionary back to the pickle file
+        with open('scoreboard.pickle', 'wb') as pf:
+            pickle.dump(user_scores, pf)
+
+    def start_game(self):
+        runpy.run_path(path_name='snake.py')
+        print("Attempting to read score file...")
+        try:
+            with open('score.txt', 'r') as f:
+                global score
+                score = f.read().strip()
+            print(f"Score: {score}")
+            self.load_score()
+        except:
+            print("No score found.")
+
 
     # third column
     def msgsend(self):
