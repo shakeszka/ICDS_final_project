@@ -7,3 +7,7 @@ Project:
 This project, Monogram, features a comprehensive chat system (like Telegram and WhatsApp), equipped with a full range of messaging functionalities, along with some unique additions.
 
 Monogram's extensions also feature a graphical user interface (GUI), public key encryption, a snake game. Also, if you like the project, you can use the script for two-player Tic-Tac-Toe game included in this repository to integrate it to the existing GUI. Good luck!
+
+The presentation for the project is attached in this repository. 
+The video of the presentation -> https://youtu.be/M0HvUOrGyHo?si=TrThJIhDS7Wmxrlm
+
