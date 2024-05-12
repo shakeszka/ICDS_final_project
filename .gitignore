@@ -2,6 +2,7 @@
 *.pyc
 .whl
 *pk
+!roman.txt.pk
 *pickle
 tempCodeRunnerFile.py
 *.mp3
